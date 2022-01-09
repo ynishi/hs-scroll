@@ -21,6 +21,15 @@ maintainer:         ytk.nishimura@gmail.com
 -- category:
 extra-source-files: CHANGELOG.md
 
+library
+    default-language: Haskell2010
+    exposed-modules:
+       Lib  
+    hs-source-dirs: src
+    build-depends:    base ^>=4.14.3.0
+                     ,foldl
+                     ,turtle
+
 executable hs-scroll
     main-is:          Main.hs
 
@@ -32,5 +41,24 @@ executable hs-scroll
     build-depends:    base ^>=4.14.3.0
                      ,foldl
                      ,turtle
+                     ,hs-scroll
     hs-source-dirs:   app
+    default-language: Haskell2010
+
+executable hs-scroll-gui
+    main-is:          Main.hs
+
+    -- Modules included in this executable, other than Main.
+    -- other-modules:
+
+    -- LANGUAGE extensions used by modules in this package.
+    -- other-extensions:
+    build-depends:    base ^>=4.14.3.0
+                     ,haskell-gi-base
+                     ,gi-gtk == 3.0.* 
+                     ,foldl
+                     ,turtle
+                     ,hs-scroll
+                     ,text
+    hs-source-dirs:   gui 
     default-language: Haskell2010
