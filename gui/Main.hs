@@ -14,7 +14,7 @@ main :: IO ()
 main = do
     Gtk.init Nothing
 
-    win <- new Gtk.Window [#title := "Hi there"]
+    win <- new Gtk.Window [#title := "Hi there", #defaultWidth := 200, #defaultHeight := 160]
 
     on win #destroy Gtk.mainQuit
 
@@ -26,19 +26,26 @@ main = do
             button
             #clicked
             $ do
+                orig <- getActiveWid
                 t <- eb `get` #text
                 wid' <-
                     if t == ""
                         then do
-                            set button [#sensitive := False, #label := getPromptS]
+                            set button [#sensitive := False, #label := "move to window(wait 1 sec)"]
+                            Tu.sleep 1
                             wid <- getWid
                             set eb [#text := wid]
                             return wid
-                        else return t
+                        else do
+                            set button [#sensitive := False, #label := "move to window(wait 1 sec)"]
+                            Tu.sleep 1
+                            return t
 
-                runScroll wid' 30
+                runScroll wid'
 
-                set button [#sensitive := True, #label := "Click me"]
+                activate orig
+                set button [#sensitive := True, #label := "Set wid: " <> wid' <> ", Click me"]
+
     #add win button
 
     #showAll win

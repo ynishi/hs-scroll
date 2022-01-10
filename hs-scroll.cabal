@@ -26,8 +26,11 @@ library
   exposed-modules:  Lib
   hs-source-dirs:   src
   build-depends:
-    , base    ^>=4.14.3.0
+    , base     ^>=4.14.3.0
     , foldl
+    , mtl
+    , process
+    , text
     , turtle
 
 executable hs-scroll
