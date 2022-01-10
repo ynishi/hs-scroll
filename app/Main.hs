@@ -10,5 +10,8 @@ import qualified Turtle as Tu
 main :: IO ()
 main = do
     print getPromptS
+    orig <- getActiveWid
     wid <- getWid
-    runScroll wid 30
+    runScroll wid
+    activate orig
+    print "complete"

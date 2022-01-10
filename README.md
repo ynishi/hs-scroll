@@ -1,5 +1,9 @@
 # hs-scroll
-* require xdotool
+* require
+  * xdotool
+  * xclip
+  * ImageMagick
+  * Setting Ctrl+Alt+Print take window's screen shot. 
 * cabal
 * ghc-8.10
 
