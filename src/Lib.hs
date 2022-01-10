@@ -10,7 +10,6 @@ import Control.Monad
 import Control.Monad.Cont
 import qualified Data.List as L
 import qualified Data.Text as T
-import System.Process
 import qualified Turtle as Tu
 
 getPromptS :: Tu.Text
