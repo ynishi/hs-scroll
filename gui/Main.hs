@@ -9,9 +9,12 @@ import qualified Data.Text as T
 import qualified GI.Gtk as Gtk
 import Lib
 import qualified Turtle as Tu
+import Opt
 
 main :: IO ()
 main = do
+    opt <- getOpt
+
     Gtk.init Nothing
 
     win <- new Gtk.Window [#title := "Hi there", #defaultWidth := 200, #defaultHeight := 160]
@@ -41,7 +44,7 @@ main = do
                             Tu.sleep 1
                             return t
 
-                runScroll wid'
+                runScroll wid' (printScreenKey opt) (workDir opt)
 
                 activate orig
                 set button [#sensitive := True, #label := "Set wid: " <> wid' <> ", Click me"]
