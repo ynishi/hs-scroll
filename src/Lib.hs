@@ -15,10 +15,16 @@ import qualified Turtle as Tu
 getPromptS :: Tu.Text
 getPromptS = "please select window"
 
-getActiveWid :: forall (m :: * -> *). Tu.MonadIO m => m Tu.Text
+getActiveWid ::
+    forall (m :: * -> *).
+    Tu.MonadIO m =>
+    m Tu.Text
 getActiveWid = getWidInner "getActivewindow"
 
-getWid :: forall (m :: * -> *). Tu.MonadIO m => m Tu.Text
+getWid ::
+    forall (m :: * -> *).
+    Tu.MonadIO m =>
+    m Tu.Text
 getWid = getWidInner "selectwindow"
 
 getWidInner cmd = do
@@ -26,7 +32,8 @@ getWidInner cmd = do
     let wid = Tu.lineToText $ head selected
     return wid
 
-runScroll wid = do
+runScroll wid printScreenKey workDir = do
+    initWorkDir
     focus wid ["key", "Home"]
     Tu.sleep 1
     prefile <- prscn "pre"
@@ -37,29 +44,40 @@ runScroll wid = do
                 focus wid . T.words . T.unwords . replicate 5 $ "click 5"
                 Tu.sleep 1
                 currentfile <- prscn "current"
-                e <- Tu.proc "compare" ["-metric", "AE", "-fuzz", "10%", prefile, currentfile, "-compose"] Tu.empty
+                e <-
+                    Tu.proc
+                        "compare"
+                        ["-metric", "AE", "-fuzz", "10%", prefile, currentfile, "-compose"]
+                        Tu.empty
                 Tu.proc "mv" [currentfile, prefile] Tu.empty
                 when (e == Tu.ExitSuccess) $ break ()
             )
   where
     withBreak = flip runContT pure . callCC
-    prscn pre = do
-        let d = "/tmp/scroll" <> pre
-        Tu.proc "rm" ["-rf", d] Tu.empty
-        Tu.proc "mkdir" ["-p", d] Tu.empty
-        let d' = d <> "/" <> pre
-        let dumpfile = d' <> ".png"
-        let outfile = d' <> "-out.png"
-        let retfile = d' <> "-out-2.png"
-        focus wid ["key", "Ctrl+Alt+Print"]
+    initWorkDir = do
+        Tu.proc "rm" ["-rf", workDir] Tu.empty
+        Tu.proc "mkdir" ["-p", workDir] Tu.empty
+    prscn prefix = do
+        let [dumpfile, outfile, retfile] =
+                map
+                    (\suffix -> workDir <> "/" <> prefix <> suffix)
+                    [".png", "-out.png", "-out-2.png"]
+        focus wid ["key", printScreenKey]
         Tu.sleep 1
-        Tu.shell ("xclip -selection clipboard -t image/png -o > " <> dumpfile) Tu.empty
+        Tu.shell
+            ("xclip -selection clipboard -t image/png -o > " <> dumpfile)
+            Tu.empty
         Tu.proc "convert" ["-crop", "80%x50%", dumpfile, outfile] Tu.empty
         return retfile
 
+activate :: MonadIO m => Tu.Text -> m Tu.ExitCode
 activate wid = xdo ["windowactivate", wid]
+
 focus wid cmds = do
-    let pre = if wid == "" then [] else ["windowfocus", "--sync"]
+    let pre =
+            if wid == ""
+                then []
+                else ["windowfocus", "--sync"]
     let cmd' = pre ++ [wid] ++ cmds
     xdo cmd'
 
