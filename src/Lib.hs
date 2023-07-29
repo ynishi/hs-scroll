@@ -44,6 +44,8 @@ runScroll wid printScreenKey workDir = do
                 focus wid . T.words . T.unwords . replicate 5 $ "click 5"
                 Tu.sleep 1
                 currentfile <- prscn "current"
+                isExist <- checkFile currentfile
+                unless isExist $ break ()
                 e <-
                     Tu.proc
                         "compare"
@@ -69,6 +71,11 @@ runScroll wid printScreenKey workDir = do
             Tu.empty
         Tu.proc "convert" ["-crop", "80%x50%", dumpfile, outfile] Tu.empty
         return retfile
+    checkFile file = do
+        exitCode <- Tu.proc "ls" [file] Tu.empty
+        let isExist = exitCode == Tu.ExitSuccess
+        unless isExist $ liftIO $ print $ "Not exist screenshot file: " <> file
+        return isExist
 
 activate :: MonadIO m => Tu.Text -> m Tu.ExitCode
 activate wid = xdo ["windowactivate", wid]
